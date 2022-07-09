@@ -33,3 +33,41 @@ jobs:
       # Run Tests
       - name: Run Tests
         run: mvn -B test
+  # Sonar's Job
+  sonar:
+    # depends on test's job
+    needs: tests
+    name: SonarCloud analysis
+    # run on ubuntu using the latest version
+    runs-on: ubuntu-latest
+    # job's steps
+    steps:
+      # check-out repository under $GITHUB_WORKSPACE, so the workflow can access it
+      - uses: actions/checkout@v1
+      # set up JDK11
+      - name: set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      # set up sonarcloud cache
+      - name: cache sonarcloud packages
+        # this action allows caching dependencies and build outputs to improve workflow execution time.
+        uses: actions/cache@v1
+        with: 
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      # set up maven cache
+      - name: cache maven packages
+        # this action allows caching dependencies and build outputs to improve workflow execution time.
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      # analyze project with sonarcloud
+      - name: analyze with sonarcloud
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=johnnypu_data -Dsonar.organization=johnnypu -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
+        env: 
+          GITHUB_TOKEN: ${{ secret.GITHUB_TOKEN }}
+          $SONAR_TOKEN: ${{ secret.SONAR_TOKEN }}
