@@ -15,7 +15,9 @@
 	<description>Demo project for Spring Boot with CICd</description>
 	<properties>
 		<java.version>11</java.version>
-	</properties>
+                <sonar.organization>johnnypu</sonar.organization>
+                <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        </properties>	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
