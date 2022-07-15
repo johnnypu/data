@@ -71,3 +71,38 @@ jobs:
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  # Build Job
+  build:
+    # depends on sonar's job
+    needs: sonar
+    name: Build
+    # run on ubuntu using the latest version
+    runs-on: ubuntu-latest
+    steps:
+      # check-out the repository under $GITHUB_WORKSPAC, so the workflow can access it
+      - uses: actions/checkout@v1
+      # set up JDK 11
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      # set up maven cache
+      - name: cache maven packages
+        # this actions allows caching dependencies and build outputs to improve workflow execution time.
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      # build the application using maven
+      - name: build with maven
+        run: mvn -B clean package -DskipTests --file pom.xml
+      # build the application using maven
+      - name: upload jar
+        # this uploads artifacts from your workflow allowing you to share data between jobs and store data once a workflow is complete.
+        uses: actions/upload-artifact@v2
+        with:
+          # set artifact name
+          name: artifact
+          # from this path
+          path: target/data-0.0.1-SNAPSHOT.jar
