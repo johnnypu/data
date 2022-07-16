@@ -9,4 +9,4 @@ PS> Invoke-WebRequest -Uri http://localhost:8080/currencies | Select -ExpandProp
 
 ````
 
-Unit Test -> SonarQube Cloud 
+Unit Test -> SonarQube Cloud -> Build -> Deploy
